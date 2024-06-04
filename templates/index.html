@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twitter Hate Speech Detection</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        max-width: 600px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .btn-submit {
+        background-color: #007bff;
+        color: white;
+      }
+      .result {
+        margin-top: 30px;
+      }
+      h1 {
+        margin-bottom: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container text-center">
+      <h1>Twitter Hate Speech Detection</h1>
+      <form id="tweetForm" class="form-group" action="/" method="post">
+        <textarea
+          id="tweetText"
+          name="tweetText"
+          class="form-control"
+          rows="4"
+          placeholder="Enter your tweet here..."
+          required
+        ></textarea
+        ><br />
+        <button type="submit" class="btn btn-submit btn-block">Submit</button>
+      </form>
+      <div class="result">
+        <h2>Prediction Result:</h2>
+        <p id="result" class="font-weight-bold"></p>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("tweetForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const tweetText = document.getElementById("tweetText").value;
+
+          fetch("/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ speech: tweetText }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById("result").textContent = data.result;
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+    </script>
+  </body>
+</html>
