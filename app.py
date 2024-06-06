@@ -7,15 +7,14 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 # Ensure necessary NLTK data is downloaded
-nltk.download('stopwords')
-nltk.download('punkt')
-nltk.download('wordnet')
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('wordnet')
 
 app = Flask(__name__)
 
 # Load the pre-trained model and the TF-IDF vectorizer
-model = pickle.load(open('model.pkl', 'rb'))
-
+model = pickle.load(open('xgb_model.pkl', 'rb'))
 with open('tfidf_vectorizer.pkl', 'rb') as vectorizer_file:
     vectorizer = pickle.load(vectorizer_file)
 
@@ -34,17 +33,13 @@ def data_processing(tweet):
     return " ".join(lemmatized_tweet)
 
 def predict_speech(text):
-    # Preprocess the input text
     processed_text = data_processing(text)
-    print(f"Processed Text: {processed_text}")  # Debug statement
-    # Transform the input text using the TF-IDF vectorizer
+    print(f"Processed Text: {processed_text}") 
     text_transformed = vectorizer.transform([processed_text])
-    print(f"Transformed Text Shape: {text_transformed.shape}")  # Debug statement
-    # Predict the category using the loaded model
+    print(f"Transformed Text Shape: {text_transformed.shape}") 
     prediction = model.predict(text_transformed)
-    # Map the prediction to a human-readable label
     label_map = {0: "Hate Speech", 1: "Offensive Speech", 2: "Neither"}
-    print(f"Prediction: {label_map[prediction[0]]}")  # Debug statement
+    print(f"Prediction: {label_map[prediction[0]]}")  
     return label_map[prediction[0]]
 
 @app.route('/')
