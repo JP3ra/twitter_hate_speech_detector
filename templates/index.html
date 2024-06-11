@@ -5,38 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Twitter Hate Speech Detection</title>
     <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        background-color: #f8f9fa;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      .container {
-        max-width: 600px;
-      }
-      .form-group {
-        margin-bottom: 20px;
-      }
-      .btn-submit {
-        background-color: #007bff;
-        color: white;
-      }
-      .result {
-        margin-top: 30px;
-      }
-      h1 {
-        margin-bottom: 40px;
-      }
-    </style>
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
-    <div class="container text-center">
-      <h1>Twitter Hate Speech Detection</h1>
+    <div class="landing-container" id="landingPage">
+      <h1>Welcome to Hate Speech Detection</h1>
+      <p style="color: white">
+        One stop platform for detecting and filtering out hate speech from
+        tweets to ensure a safer and more respectful online community. Click the
+        button below to start analyzing tweets for hate speech.
+      </p>
+      <button class="btn btn-redirect" onclick="showHateSpeechDetectionPage()">
+        Let's get start
+      </button>
+    </div>
+    <div class="container" id="detectionPage" style="display: none">
+      <h1>Hate Speech Detection</h1>
       <form id="tweetForm" class="form-group" action="/" method="post">
         <textarea
           id="tweetText"
@@ -45,21 +32,33 @@
           rows="4"
           placeholder="Enter your tweet here..."
           required
-        ></textarea
-        ><br />
+        ></textarea>
+        <br />
         <button type="submit" class="btn btn-submit btn-block">Submit</button>
       </form>
       <div class="result">
         <h2>Prediction Result:</h2>
-        <p id="result" class="font-weight-bold"></p>
+        <p id="result" class="font-weight-bold result-text"></p>
       </div>
     </div>
     <script>
+      function showHateSpeechDetectionPage() {
+        document.getElementById("landingPage").style.display = "none";
+        document.getElementById("detectionPage").style.display = "block";
+      }
+
       document
         .getElementById("tweetForm")
         .addEventListener("submit", function (event) {
           event.preventDefault();
           const tweetText = document.getElementById("tweetText").value;
+
+          // Clear previous result and add animation
+          const resultDiv = document.querySelector(".result");
+          const resultText = document.getElementById("result");
+          resultDiv.classList.remove("visible");
+          resultDiv.style.opacity = 0;
+          resultText.className = "font-weight-bold result-text"; // Reset classes
 
           fetch("/predict", {
             method: "POST",
@@ -70,7 +69,20 @@
           })
             .then((response) => response.json())
             .then((data) => {
-              document.getElementById("result").textContent = data.result;
+              console.log(data); // Log the response for debugging
+              if (data.result === "Hate Speech") {
+                resultText.textContent = "The tweet is indicating hate.";
+                resultText.classList.add("hate");
+              } else if (data.result === "Offensive Speech") {
+                resultText.textContent = "The tweet is offensive.";
+                resultText.classList.add("offensive");
+              } else {
+                resultText.textContent =
+                  "The tweet is neither hate nor offensive.";
+                resultText.classList.add("neither");
+              }
+              resultDiv.classList.add("visible");
+              resultDiv.style.animation = "fadeIn 1s forwards";
             })
             .catch((error) => {
               console.error("Error:", error);

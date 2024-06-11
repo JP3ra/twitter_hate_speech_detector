@@ -1,0 +1,124 @@
+body {
+  background-image: url("/static/images/2.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+}
+
+.landing-container {
+  text-align: center;
+  background: rgb(5, 28, 52);
+  padding: 30px;
+  width:40%;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  opacity: 0.9;
+}
+
+.container {
+  max-width: 600px;
+  width: 35%;
+  background: rgb(5, 28, 52);
+  padding: 30px;
+  border-radius: 15px;
+  border-color: #333;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0.9;
+}
+
+.container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+textarea {
+  border-radius: 10px;
+  border: 1px solid #a1e7e3;
+  padding: 15px;
+  font-size: 16px;
+  color: rgb(132, 154, 159);
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  resize: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+textarea:focus {
+  border-color: #61a4bc;
+  box-shadow: 0 0 15px rgba(97, 164, 188, 0.5);
+  outline: none;
+}
+
+.btn-submit, .btn-redirect {
+  background-color: #61a4bc;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border: none;
+  width: 100%;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px; /* Added margin for spacing */
+}
+
+.btn-submit:hover, .btn-redirect:hover {
+  background-color: #5193a4;
+  transform: scale(1.05);
+}
+
+.result {
+  margin-top: 30px;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.result.visible {
+  opacity: 1;
+}
+
+.result-text.hate {
+  color: orange; /* Color for hate speech */
+}
+
+.result-text.offensive {
+  color: red; /* Color for offensive speech */
+}
+
+.result-text.neither {
+  color: green; /* Color for neither hate nor offensive speech */
+}
+
+h1 {
+  margin-bottom: 40px;
+  font-weight: 700;
+  color: white;
+}
+
+h2 {
+  color: #555;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
