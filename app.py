@@ -1,3 +1,4 @@
+# jp3ra jp3ra
 from flask import Flask, request, jsonify, render_template
 import pickle
 import re
@@ -5,13 +6,15 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
-# Ensure necessary NLTK data is downloaded
-# nltk.download('stopwords')
-# nltk.download('punkt')
-# nltk.download('wordnet')
+from pymongo import MongoClient
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
+
+# Connect to MongoDB
+client = MongoClient('mongodb+srv://jyotiprakash2409:jp3ra@cluster0.tvxyswb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+db = client['hatespeechdetector']
+users_collection = db['users']
 
 # Load the pre-trained model and the TF-IDF vectorizer
 model = pickle.load(open('xgb_model.pkl', 'rb'))
@@ -34,13 +37,14 @@ def data_processing(tweet):
 
 def predict_speech(text):
     processed_text = data_processing(text)
-    print(f"Processed Text: {processed_text}") 
     text_transformed = vectorizer.transform([processed_text])
-    print(f"Transformed Text Shape: {text_transformed.shape}") 
     prediction = model.predict(text_transformed)
     label_map = {0: "Hate Speech", 1: "Offensive Speech", 2: "Neither"}
-    print(f"Prediction: {label_map[prediction[0]]}")  
     return label_map[prediction[0]]
+
+def ban_user(username):
+    ban_until = datetime.now() + timedelta(days=2)
+    users_collection.update_one({"username": username}, {"$set": {"ban_until": ban_until}})
 
 @app.route('/')
 def index():
@@ -49,9 +53,30 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
+    username = data.get('username')
     speech_text = data.get('speech')
+
+    user = users_collection.find_one({"username": username})
+    if not user:
+        users_collection.insert_one({"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None})
+        user = {"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None}
+
+    if user.get("ban_until") and user.get("ban_until") > datetime.now():
+        return jsonify({"result": "Banned", "message": "Your account is banned until {}".format(user.get("ban_until").strftime('%Y-%m-%d %H:%M:%S'))})
+
     prediction = predict_speech(speech_text)
-    return jsonify({'result': prediction})
+    if prediction == "Hate Speech":
+        users_collection.update_one({"username": username}, {"$inc": {"hate_count": 1}})
+        if user.get("hate_count", 0) >= 5:
+            ban_user(username)
+            return jsonify({"result": "Banned", "message": "Your account is banned for 2 days due to excessive hate speech."})
+    elif prediction == "Offensive Speech":
+        users_collection.update_one({"username": username}, {"$inc": {"offensive_count": 1}})
+        if user.get("offensive_count", 0) >= 5:
+            ban_user(username)
+            return jsonify({"result": "Banned", "message": "Your account is banned for 2 days due to excessive offensive speech."})
+
+    return jsonify({"result": prediction})
 
 if __name__ == '__main__':
     app.run(debug=True)

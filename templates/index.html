@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -90,4 +90,140 @@
         });
     </script>
   </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twitter Hate Speech Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="landing-container" id="landingPage">
+    <h1>Welcome to Hate Speech Detection</h1>
+    <p style="color: white">
+      One stop platform for detecting and filtering out hate speech from tweets to ensure a safer and more respectful online community. Click the button below to start analyzing tweets for hate speech.
+    </p>
+    <button class="btn btn-redirect" onclick="showHateSpeechDetectionPage()">
+      Let's get started
+    </button>
+  </div>
+  <div class="container" id="detectionPage" style="display: none">
+    <h1>Hate Speech Detection</h1>
+    <form id="tweetForm" class="form-group" action="/" method="post">
+      <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required />
+      <br />
+      <textarea id="tweetText" name="tweetText" class="form-control" rows="4" placeholder="Enter your tweet here..." required></textarea>
+      <br />
+      <button type="submit" class="btn btn-submit btn-block">Submit</button>
+    </form>
+    <div class="result">
+      <h2>Prediction Result:</h2>
+      <p id="result" class="font-weight-bold result-text"></p>
+    </div>
+  </div>
+  <div id="banPopup" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePopup()">&times;</span>
+      <p id="banMessage"></p>
+    </div>
+  </div>
+  <script>
+    function showHateSpeechDetectionPage() {
+      document.getElementById("landingPage").style.display = "none";
+      document.getElementById("detectionPage").style.display = "block";
+    }
+
+    function showPopup(message) {
+      const popup = document.getElementById("banPopup");
+      const messageText = document.getElementById("banMessage");
+      messageText.textContent = message;
+      popup.style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("banPopup").style.display = "none";
+    }
+
+    document.getElementById("tweetForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const tweetText = document.getElementById("tweetText").value;
+      const username = document.getElementById("username").value;
+
+      // Clear previous result and add animation
+      const resultDiv = document.querySelector(".result");
+      const resultText = document.getElementById("result");
+      resultDiv.classList.remove("visible");
+      resultDiv.style.opacity = 0;
+      resultText.className = "font-weight-bold result-text"; // Reset classes
+
+      fetch("/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: username, speech: tweetText }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data); // Log the response for debugging
+          if (data.result === "Banned") {
+            showPopup(data.message);
+          } else {
+            if (data.result === "Hate Speech") {
+              resultText.textContent = "The tweet is indicating hate.";
+              resultText.classList.add("hate");
+            } else if (data.result === "Offensive Speech") {
+              resultText.textContent = "The tweet is offensive.";
+              resultText.classList.add("offensive");
+            } else {
+              resultText.textContent = "The tweet is neither hate nor offensive.";
+              resultText.classList.add("neither");
+            }
+            resultDiv.classList.add("visible");
+            resultDiv.style.animation = "fadeIn 1s forwards";
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+  </script>
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</body>
 </html>
