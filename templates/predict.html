@@ -68,20 +68,36 @@
             <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
               <form action="/predict" method="POST" id="predict-form">
                 <input
-                  type="text"
-                  name="tweet_id_or_url"
-                  placeholder="Enter Tweet ID or URL"
-                  class="form-control"
-                  required
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username"
+                    class="form-control"
+                    required
+                />
+                <br />
+                <input
+                    type="text"
+                    name="tweet_id_or_url"
+                    placeholder="Enter Tweet ID or URL"
+                    class="form-control"
+                    required
                 />
                 <br />
                 <button type="submit" class="btn-get-started">
-                  Analyze Tweet
+                    Analyze Tweet
                 </button>
-              </form>
+            </form>
+            
             </div>
             <div id="prediction-result" data-aos="fade-up" data-aos-delay="300">
-              <!-- The prediction result will be displayed here -->
+              {% if result %}
+                <p>Username: {{ username }}</p>
+                <p>Tweet: {{ tweet }}</p>
+                <p>Result: {{ result }}</p>
+                {% if message %}
+                  <p>Message: {{ message }}</p>
+                {% endif %}
+              {% endif %}
             </div>
           </div>
         </div>
@@ -106,20 +122,18 @@
       </div>
     </footer>
 
-    <!-- Scroll Top -->
-    <a
-      href="#"
-      class="scroll-top d-flex align-items-center justify-content-center"
+    <!-- Scroll Top Button -->
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"
       ><i class="bi bi-arrow-up-short"></i
     ></a>
 
-    <!-- JS Files -->
+    <!-- Vendor JS Files -->
     <script src="static/bootstrap.bundle.min.js"></script>
     <script src="static/aos.js"></script>
     <script src="static/glightbox.min.js"></script>
-    <script src="static/isotope.pkgd.min.js"></script>
     <script src="static/swiper-bundle.min.js"></script>
-    <script src="static/purecounter_vanilla.js"></script>
+
+    <!-- Main JS File -->
     <script src="static/main.js"></script>
   </body>
 </html>
