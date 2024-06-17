@@ -1,135 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Twitter Hate Speech Detection</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
-<body>
-  <div class="landing-container" id="landingPage">
-    <h1>Welcome to Hate Speech Detection</h1>
-    <p style="color: white">
-      One stop platform for detecting and filtering out hate speech from tweets to ensure a safer and more respectful online community. Click the button below to start analyzing tweets for hate speech.
-    </p>
-    <button class="btn btn-redirect" onclick="showHateSpeechDetectionPage()">
-      Let's get started
-    </button>
-  </div>
-  <div class="container" id="detectionPage" style="display: none">
-    <h1>Hate Speech Detection</h1>
-    <form id="tweetForm" class="form-group" action="/" method="post">
-      <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required />
-      <br />
-      <textarea id="tweetText" name="tweetText" class="form-control" rows="4" placeholder="Enter your tweet here..." required></textarea>
-      <br />
-      <button type="submit" class="btn btn-submit btn-block">Submit</button>
-    </form>
-    <div class="result">
-      <h2>Prediction Result:</h2>
-      <p id="result" class="font-weight-bold result-text"></p>
-    </div>
-  </div>
-  <div id="banPopup" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closePopup()">&times;</span>
-      <p id="banMessage"></p>
-    </div>
-  </div>
-  <script>
-    function showHateSpeechDetectionPage() {
-      document.getElementById("landingPage").style.display = "none";
-      document.getElementById("detectionPage").style.display = "block";
-    }
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Index - QuickScan Bootstrap Template</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
 
-    function showPopup(message) {
-      const popup = document.getElementById("banPopup");
-      const messageText = document.getElementById("banMessage");
-      messageText.textContent = message;
-      popup.style.display = "block";
-    }
+    <!-- Favicons -->
+    <link href="static/images/favicon.png" rel="icon" />
+    <link href="static/images/apple-touch-icon.png" rel="apple-touch-icon" />
 
-    function closePopup() {
-      document.getElementById("banPopup").style.display = "none";
-    }
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+      rel="stylesheet"
+    />
 
-    document.getElementById("tweetForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const tweetText = document.getElementById("tweetText").value;
-      const username = document.getElementById("username").value;
+    <!-- Vendor CSS Files -->
+    <link href="static/bootstrap.min.css" rel="stylesheet" />
+    <link href="static/bootstrap-icons.css" rel="stylesheet" />
+    <link href="static/aos.css" rel="stylesheet" />
+    <link href="static/glightbox.min.css" rel="stylesheet" />
+    <link href="static/swiper-bundle.min.css" rel="stylesheet" />
 
-      // Clear previous result and add animation
-      const resultDiv = document.querySelector(".result");
-      const resultText = document.getElementById("result");
-      resultDiv.classList.remove("visible");
-      resultDiv.style.opacity = 0;
-      resultText.className = "font-weight-bold result-text"; // Reset classes
+    <!-- Main CSS File -->
+    <link href="static/main.css" rel="stylesheet" />
 
-      fetch("/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: username, speech: tweetText }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data); // Log the response for debugging
-          if (data.result === "Banned") {
-            showPopup(data.message);
-          } else {
-            if (data.result === "Hate Speech") {
-              resultText.textContent = "The tweet is indicating hate.";
-              resultText.classList.add("hate");
-            } else if (data.result === "Offensive Speech") {
-              resultText.textContent = "The tweet is offensive.";
-              resultText.classList.add("offensive");
-            } else {
-              resultText.textContent = "The tweet is neither hate nor offensive.";
-              resultText.classList.add("neither");
-            }
-            resultDiv.classList.add("visible");
-            resultDiv.style.animation = "fadeIn 1s forwards";
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    });
-  </script>
-  <style>
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-  </style>
-</body>
+    <!-- =======================================================
+  * Template Name: QuickStart
+  * Template URL: https://bootstrapmade.com/quickstart-bootstrap-startup-website-template/
+  * Updated: Jun 14 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+  </head>
+
+  <body class="index-page">
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a href="index.html" class="logo d-flex align-items-center me-auto">
+          <img src="static/images/logo.png" alt="" />
+          <h1 class="sitename">QuickScan</h1>
+        </a>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section id="hero" class="hero section">
+        <div class="hero-bg">
+          <img src="static/images/hero-bg-light.webp" alt="" />
+        </div>
+        <div class="container text-center">
+          <div
+            class="d-flex flex-column justify-content-center align-items-center"
+          >
+            <h1 data-aos="fade-up">Welcome to <span>QuickScan</span></h1>
+            <p data-aos="fade-up" data-aos-delay="100">
+              One stop platform for detecting and filtering out hate speech from
+              tweets to ensure a safer and more respectful online community.
+              Click the button below to start analyzing tweets for hate
+              speech.<br />
+            </p>
+            <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+              <a href="/predict" class="btn-get-started">Get Started</a>
+            </div>
+            <img
+              src="static/images/hero-services-img.webp"
+              class="img-fluid hero-img"
+              alt=""
+              data-aos="zoom-out"
+              data-aos-delay="300"
+            />
+          </div>
+        </div>
+      </section>
+      <!-- /Hero Section -->
+
+      <!-- Contact Section -->
+      <section id="contact" class="contact section">
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Contact</h2>
+          <p>
+            For any queries and feedback/suggestions, feel free to drop a
+            message.
+          </p>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-4">
+            <div class="col-lg-6">
+              <div
+                class="info-item d-flex flex-column justify-content-center align-items-center"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                <h3>Address</h3>
+                <p>Banashankari 3rd Stage, Bangalore-560085</p>
+              </div>
+            </div>
+            <!-- End Info Item -->
+
+            <div class="col-lg-3 col-md-6">
+              <div
+                class="info-item d-flex flex-column justify-content-center align-items-center"
+                data-aos="fade-up"
+                data-aos-delay="300"
+              >
+                <h3>Call Us</h3>
+                <p>+91 9374672820</p>
+              </div>
+            </div>
+            <!-- End Info Item -->
+
+            <div class="col-lg-3 col-md-6">
+              <div
+                class="info-item d-flex flex-column justify-content-center align-items-center"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <h3>Email Us</h3>
+                <p>twitter@example.com</p>
+              </div>
+            </div>
+            <!-- End Info Item -->
+          </div>
+
+          <div class="row gy-4 mt-1">
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1944.4132799115072!2d77.5689732!3d12.9299266!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3e8d8b9b8c8f%3A0x8820e4b7d9c6e755!2sBanashankari%20Stage%203%2C%20Banashankari%2C%20Bengaluru%2C%20Karnataka%20560085%2C%20India!5e0!3m2!1sen!2sus!4v1686961268712!5m2!1sen!2sus&markers=color:red%7C12.928358,77.564907"
+                width="600"
+                height="450"
+                style="border: 0"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+            <!-- End Google Maps -->
+
+            <div class="col-lg-6">
+              <form
+                action="forms/contact.php"
+                method="post"
+                class="php-email-form"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <div class="row gy-4">
+                  <div class="col-md-6">
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      placeholder="Your Name"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      placeholder="Your Email"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-12">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="subject"
+                      placeholder="Subject"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-12">
+                    <textarea
+                      class="form-control"
+                      name="message"
+                      rows="6"
+                      placeholder="Message"
+                      required=""
+                    ></textarea>
+                  </div>
+
+                  <div class="col-md-12 text-center">
+                    <div class="loading">Loading</div>
+                    <div class="error-message"></div>
+                    <div class="sent-message">
+                      Your message has been sent. Thank you!
+                    </div>
+
+                    <button type="submit">Send Message</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- End Contact Form -->
+          </div>
+        </div>
+      </section>
+      <!-- /Contact Section -->
+    </main>
+
+    <footer>
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span>
+          <strong class="px-1 sitename">QuickScan</strong>
+          <span>All Rights Reserved</span>
+        </p>
+        <div class="credits">
+          <!-- All the links in the footer should remain intact. -->
+          <!-- You can delete the links only if you've purchased the pro version. -->
+          <!-- Licensing information: https://bootstrapmade.com/license/ -->
+          <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+          Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll Top -->
+    <a
+      href="#"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <!-- JS Files -->
+    <script src="static/bootstrap.bundle.min.js"></script>
+    <script src="static/aos.js"></script>
+    <script src="static/glightbox.min.js"></script>
+    <script src="static/isotope.pkgd.min.js"></script>
+    <script src="static/swiper-bundle.min.js"></script>
+    <script src="static/purecounter_vanilla.js"></script>
+    <script src="static/main.js"></script>
+  </body>
 </html>
