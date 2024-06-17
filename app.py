@@ -63,19 +63,24 @@ def predict():
             user = {"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None}
 
         if user.get("ban_until") and user.get("ban_until") > datetime.now():
-            return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned until {}".format(user.get("ban_until").strftime('%Y-%m-%d %H:%M:%S')))
+            return render_template('predict.html', 
+                       username=username, 
+                       tweet=speech_text, 
+                       result="Banned", 
+                       message="{}'s account is banned until {}".format(username, user.get("ban_until").strftime('%Y-%m-%d %H:%M:%S')))
+
 
         prediction = predict_speech(speech_text)
         if prediction == "Hate Speech":
             users_collection.update_one({"username": username}, {"$inc": {"hate_count": 1}})
             if user.get("hate_count", 0) >= 5:
                 ban_user(username)
-                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned for 2 days due to excessive hate speech.")
+                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message=f"{username} is banned for 2 days due to excessive hate speech.")
         elif prediction == "Offensive Speech":
             users_collection.update_one({"username": username}, {"$inc": {"offensive_count": 1}})
             if user.get("offensive_count", 0) >= 5:
                 ban_user(username)
-                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned for 2 days due to excessive offensive speech.")
+                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message=f"{username} is banned for 2 days due to excessive offensive speech.")
 
         return render_template('predict.html', username=username, tweet=speech_text, result=prediction)
 
