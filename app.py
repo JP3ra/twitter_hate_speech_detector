@@ -1,4 +1,3 @@
-# jp3ra jp3ra
 from flask import Flask, request, jsonify, render_template
 import pickle
 import re
@@ -50,33 +49,35 @@ def ban_user(username):
 def index():
     return render_template('index.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict.html', methods=['GET', 'POST'])
 def predict():
-    data = request.get_json()
-    username = data.get('username')
-    speech_text = data.get('speech')
+    if request.method == 'POST':
+        username = request.form['username']
+        speech_text = request.form['tweet']
 
-    user = users_collection.find_one({"username": username})
-    if not user:
-        users_collection.insert_one({"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None})
-        user = {"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None}
+        user = users_collection.find_one({"username": username})
+        if not user:
+            users_collection.insert_one({"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None})
+            user = {"username": username, "hate_count": 0, "offensive_count": 0, "ban_until": None}
 
-    if user.get("ban_until") and user.get("ban_until") > datetime.now():
-        return jsonify({"result": "Banned", "message": "Your account is banned until {}".format(user.get("ban_until").strftime('%Y-%m-%d %H:%M:%S'))})
+        if user.get("ban_until") and user.get("ban_until") > datetime.now():
+            return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned until {}".format(user.get("ban_until").strftime('%Y-%m-%d %H:%M:%S')))
 
-    prediction = predict_speech(speech_text)
-    if prediction == "Hate Speech":
-        users_collection.update_one({"username": username}, {"$inc": {"hate_count": 1}})
-        if user.get("hate_count", 0) >= 5:
-            ban_user(username)
-            return jsonify({"result": "Banned", "message": "Your account is banned for 2 days due to excessive hate speech."})
-    elif prediction == "Offensive Speech":
-        users_collection.update_one({"username": username}, {"$inc": {"offensive_count": 1}})
-        if user.get("offensive_count", 0) >= 5:
-            ban_user(username)
-            return jsonify({"result": "Banned", "message": "Your account is banned for 2 days due to excessive offensive speech."})
+        prediction = predict_speech(speech_text)
+        if prediction == "Hate Speech":
+            users_collection.update_one({"username": username}, {"$inc": {"hate_count": 1}})
+            if user.get("hate_count", 0) >= 5:
+                ban_user(username)
+                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned for 2 days due to excessive hate speech.")
+        elif prediction == "Offensive Speech":
+            users_collection.update_one({"username": username}, {"$inc": {"offensive_count": 1}})
+            if user.get("offensive_count", 0) >= 5:
+                ban_user(username)
+                return render_template('predict.html', username=username, tweet=speech_text, result="Banned", message="Your account is banned for 2 days due to excessive offensive speech.")
 
-    return jsonify({"result": prediction})
+        return render_template('predict.html', username=username, tweet=speech_text, result=prediction)
+
+    return render_template('predict.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
